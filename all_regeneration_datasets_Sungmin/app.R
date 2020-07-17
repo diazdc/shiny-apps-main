@@ -41,17 +41,18 @@ print("Loading Seurat objects...")
 for (i in 1:length(files)) {
   file_list[[i]] <- readRDS(files[i])
   DefaultAssay(file_list[[i]]) <- "RNA"
+  Idents(file_list[[i]]) <- "cell.type.ident"
 }
 print("done.")
 
-hmap_files <- list.files("./data", pattern = "mtx", full.names = TRUE)
-hmap_list <- list()
+# hmap_files <- list.files("./data", pattern = "mtx", full.names = TRUE)
+# hmap_list <- list()
 
-print("Loading heatmap matrices...")
-for (i in 1:length(hmap_files)) {
-  hmap_list[[i]] <- readRDS(hmap_files[i])
-}
-print("done.")
+# print("Loading heatmap matrices...")
+# for (i in 1:length(hmap_files)) {
+#   hmap_list[[i]] <- readRDS(hmap_files[i])
+# }
+# print("done.")
 
 
 # ! =========== items to check/change for project {START}
@@ -61,7 +62,7 @@ hmap_list <- hmap_list[c(2,1,3)]
 names(file_list) <- as.character(c(
   "all she-pos. cells", "neuromast cells","AP cells",
   "central cells", "HC progenitors", "mantle cells"))
-names(hmap_list) <- as.character(c("LOG", "CLR", "RC"))
+# names(hmap_list) <- as.character(c("LOG", "CLR", "RC"))
 
 trt_colors <- c("green3", "gold", "darkorange",
   "deeppink", "mediumorchid1", "deepskyblue", "blue")
