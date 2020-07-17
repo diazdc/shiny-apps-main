@@ -297,73 +297,63 @@ ui <- fixedPage(theme = shinythemes::shinytheme("lumen"), # paper lumen cosmo
     ),
 
 
-    # ================ #
-    tabPanel("Dot Plot", #fluid = FALSE,
-      sidebarLayout(fluid = TRUE,
-        
-        sidebarPanel(fluid = FALSE, width = 4,
-          column(12, align = "left  ",
-          textInput("dotGenes",
-            "Insert gene name or ensembl ID:",
-            value = smpl_genes_lg),
-          checkboxInput("dPlotClust",
-            label = "Check box to enable row clustering.", value = FALSE)),
-
-          column(12, align = "center",
-            actionButton("runDotPlot", "Generate Plots",
-            style = 'padding:5px; font-size:80%')),
-
-          column(12, tags$hr(width = "50%"), align = "center"),
-          column(12, align = "center", downloadButton(
-            "downloadDotPlot", "Download pdf",
-            style = 'padding:5px; font-size:80%')),
-
-          column(12, tags$br()),
-          column(12, align = "center", uiOutput("cellSelectDot")), # New
-          
-          column(12, tags$br()),
-          column(12, align = "center",
-            column(6,
-              radioGroupButtons("selectGrpDot",
-                "Group cells by:", choices = list(Time = "data.set",
-                  Cluster = "cell.type.ident"), width = "100%")),
-            column(6,
-              numericInput("dotScale", "Dot diameter:", value = 10, min = 4,
-                step = 1, max = 20, width = "80%"), align = "center")
-          ),
-
-          fluidRow(tags$br()),
-          fluidRow(tags$br()),
-          column(12, uiOutput("plot.uiDatFeatPlotV4"), align = "center"),
-          fluidRow(tags$br()),
-          fluidRow(tags$br())
-        ),
-        
-        mainPanel(
-          fluidRow(
-            column(8, tags$br()),
-            column(8, tags$b("Mismatches or genes not present"),
-                "(if applicable)", tags$b(":")),
-            column(8, uiOutput("notInDot")),
-            column(8, tags$hr()),
-            
-            column(8, align = "left",
-              # column(4,  align = "center", "Manual figure adjustment:",
-              #   column(11, style = "padding-top: 8px;",
-              #     switchInput("manAdjustDot", value = FALSE))),
-              column(3, align = "left", numericInput(
-                "manAdjustDotW", label = "Width (pixels):", value = 600, step = 50,
-                width = "100%")),
-              column(3,  align = "left", numericInput(
-                "manAdjustDotH", label = "Height (pixels):", value = 600, step = 50,
-                width = "100%"))
-              ),
-            fluidRow(tags$br()),
-            column(12, uiOutput("plot.uiDotPlotF"))
-          )
-        )
-      )
-    ),
+                  # ================ #
+                  tabPanel("Dot Plot", #fluid = FALSE,
+                           sidebarLayout(fluid = TRUE,
+                                         
+                                         sidebarPanel(fluid = FALSE, width = 4,
+                                                      column(12, align = "left  ",
+                                                             textInput("dotGenes",
+                                                                       "Insert gene name or ensembl ID:",
+                                                                       value = smpl_genes_lg),
+                                                             checkboxInput("dPlotClust",
+                                                                           label = "Check box to enable row clustering.", value = FALSE)),
+                                                      
+                                                      column(12, align = "center",
+                                                             actionButton("runDotPlot", "Generate Plots",
+                                                                          style = 'padding:5px; font-size:80%')),
+                                                      
+                                                      column(12, tags$hr(width = "50%"), align = "center"),
+                                                      column(12, align = "center", downloadButton(
+                                                        "downloadDotPlot", "Download pdf",
+                                                        style = 'padding:5px; font-size:80%')),
+                                                      
+                                                      column(12, tags$br()),
+                                                      column(12, align = "center", uiOutput("cellSelectDot")), # New
+                                                      
+                                                      column(12, tags$br()),
+                                                      column(12, align = "center",
+                                                             column(6,
+                                                                    radioGroupButtons("selectGrpDot",
+                                                                                      "Group cells by:", choices = list(
+                                                                                        Combined = "cell.type.ident.by.data.set",
+                                                                                        Time = "data.set",Cluster = "cell.type.ident"), width = "100%",size = "xs")),
+                                                             column(6,
+                                                                    numericInput("dotScale", "Dot diameter:", value = 10, min = 4,
+                                                                                 step = 1, max = 20, width = "60%"), align = "center")
+                                                      ),
+                                                      
+                                                      fluidRow(tags$br()),
+                                                      fluidRow(tags$br()),
+                                                      column(12, uiOutput("plot.uiDatFeatPlotV4"), align = "center"),
+                                                      fluidRow(tags$br()),
+                                                      fluidRow(tags$br())
+                                         ),
+                                         
+                                         mainPanel(
+                                           fluidRow(
+                                             column(8, tags$br()),
+                                             column(8, tags$b("Mismatches or genes not present"),
+                                                    "(if applicable)", tags$b(":")),
+                                             column(8, uiOutput("notInDot")),
+                                             column(8, tags$hr()),
+                                             
+                                             fluidRow(tags$br()),
+                                             column(12, uiOutput("plot.uiDotPlotF"))
+                                           )
+                                         )
+                           )
+                  ),
 
 
     # ================ #

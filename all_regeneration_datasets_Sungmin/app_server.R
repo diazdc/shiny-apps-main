@@ -444,91 +444,107 @@ server <- function(input, output) {
   DotPlotF <- reactive({
     clustering <- input$dPlotClust
     if (clustering == TRUE) {
-          seurat_obj <- SelectDataset()
+      seurat_obj <- SelectDataset()
       selected <- unlist(strsplit(input$dotGenes, " "))
-        
-      ifelse(selected %in% com_name,
-        selected <- selected[selected %in% com_name],
       
-        ifelse(selected %in% ens_id,
-          selected <- gene_df[ens_id %in% selected, 3],"")
+      ifelse(selected %in% com_name,
+             selected <- selected[selected %in% com_name],
+             
+             ifelse(selected %in% ens_id,
+                    selected <- gene_df[ens_id %in% selected, 3],"")
       )
       
       seurat_obj <- seurat_obj[,IDtype() %in% input$cellIdentsDot]
-
+      
       seurat_obj_sub <- seurat_obj[rownames(seurat_obj) %in% selected,]
       dist_mat <- dist(seurat_obj_sub@assays$RNA@data)
       clust <- hclust(dist_mat)
       markers_clust <- clust$labels
       
+      # if (input$selectGrpDot == "data.set") {
+      #     caption_txt <- paste(
+      #       "selected cells:", paste(input$cellIdentsDot, collapse = ", "))
+      #     stringr::str_wrap(caption_txt, width = 10)
+      #   } else {
+      #     ""
+      #   }
+      
       g <- DotPlot(seurat_obj, features = markers_clust,
-        cols = "RdYlBu", dot.scale = input$dotScale,
-        group.by = input$selectGrpDot)
-        
+                   cols = "RdYlBu", dot.scale = input$dotScale,
+                   group.by = input$selectGrpDot)
+      
       g <- g + labs(title = paste("Selected analysis:",
-        as.character(input$Analysis)), subtitle = "", caption = "") +
+                                  as.character(input$Analysis)), subtitle = "", caption = "") +
         theme(plot.title = element_text(face = "plain", size = 14))
-
+      
       g <- g + coord_flip() + theme(
         axis.text.x = element_text(angle = 90, hjust = 1))
-
+      
     } else {
       seurat_obj <- SelectDataset()
       selected <- unlist(strsplit(input$dotGenes, " "))
       
       ifelse(selected %in% com_name,
-        selected <- selected[selected %in% com_name],
+             selected <- selected[selected %in% com_name],
+             
+             ifelse(selected %in% ens_id,
+                    selected <- gene_df[ens_id %in% selected, 3],"")
+      )
       
-        ifelse(selected %in% ens_id,
-          selected <- gene_df[ens_id %in% selected, 3],"")
-        )
-
       seurat_obj <- seurat_obj[,IDtype() %in% input$cellIdentsDot]
       print(input$cellIdentsDot)
-
+      
+      # if (input$selectGrpDot == "data.set") {
+      #     caption_txt <- paste(
+      #       "selected cells:", paste(input$cellIdentsDot, collapse = ", "))
+      #     stringr::str_wrap(caption_txt, width = 10)
+      #   } else {
+      #     ""
+      #   }
+      
       g <- DotPlot(seurat_obj, features = selected,
-        cols = "RdYlBu", dot.scale = input$dotScale,
-        group.by = input$selectGrpDot)
-
+                   cols = "RdYlBu", dot.scale = input$dotScale,
+                   group.by = input$selectGrpDot)
+      
       g <- g + labs(title = paste("Selected analysis:",
-        as.character(input$Analysis)), subtitle = "", caption = "") +
+                                  as.character(input$Analysis)), subtitle = "", caption = "") +
         theme(plot.title = element_text(face = "plain", size = 14))
-
+      
       g <- g + coord_flip() + theme(
         axis.text.x = element_text(angle = 90, hjust = 1))
     }
     return(g)
   })
-
+  
   output$cellSelectDot <- renderUI({ # New cell type select
     pickerInput("cellIdentsDot", "Add or remove clusters:",
-      choices = as.character(printIdents()), multiple = TRUE,
-      selected = as.character(printIdents()), options = list(
-       `actions-box` = TRUE), width = "85%")
+                choices = as.character(printIdents()), multiple = TRUE,
+                selected = as.character(printIdents()), options = list(
+                  `actions-box` = TRUE), width = "85%")
   })
-
+  
   mismatchDot <- function() {
     selected <- unlist(strsplit(input$dotGenes, " "))
-
+    
     mismatch <- ifelse(!selected %in% c(com_name,ens_id),
-      selected[!selected %in% c(com_name,ens_id)],"")
+                       selected[!selected %in% c(com_name,ens_id)],"")
     return(mismatch)
   }
-
+  
   output$notInDot <- renderText({input$runDotPlot
     isolate({mismatchDot()})
   })
-
+  
   output$SelectedDataDot <- renderText({input$runDotPlot
-      isolate({input$Analysis})
+    isolate({input$Analysis})
   })
-
+  
   output$myDotPlotF <- renderPlot({input$runDotPlot
     isolate({withProgress({p <- DotPlotF(); print(p)},
-      message = "Rendering plot..", min = 0, max = 10, value = 10)
+                          message = "Rendering plot..", min = 0, max = 10, value = 10)
     })
   })
-
+  
   getHeightDot <- function() {
     l <- getLenInput(input$dotGenes)
     h <- paste0(as.character(l * 35), "px")
@@ -538,38 +554,35 @@ server <- function(input, output) {
   # ! check/change for project
   # TODO create formula for n clusters/treats and dplot width
   dplotWidth <- function () {
-    if(input$selectGrpDot == "data.set") {
-      w <- "500px"
+    if(input$selectGrpDot == "cell.type.ident.by.data.set") {
+      w <- "2400px"
     } else {
       w <- "800px"
     }
+    return(w)
   }
-
+  
+  output$plot.uiDotPlotF <- renderUI({input$runDotPlot
+    isolate({h <- getHeightDot(); plotOutput("myDotPlotF",
+                                             width = dplotWidth(), height = h)
+    })
+  })
+  
   dotHeight <- function() {
     l <- getLenInput(input$dotGenes)
     l <- as.numeric(l)
     return(l)
   }
-
-  # output$plot.uiDotPlotF <- renderUI({input$runDotPlot
-  #   isolate({h <- getHeightDot(); plotOutput("myDotPlotF",
-  #     width = dplotWidth(), height = h)
-  #   })
-  # })
-
-  output$plot.uiDotPlotF <- renderUI({input$runDotPlot
-  isolate({h <- getHeightDot(); plotOutput("myDotPlotF",
-    width = paste0(input$manAdjustDotW, "px"),
-    height = paste0(input$manAdjustDotH, "px"))})
-  })
   
   output$downloadDotPlot <- downloadHandler(
     filename = "dot_plot.pdf", content = function(file) {
-      pdf(file, onefile = FALSE, width = 12, height = dotHeight() * 0.5)
+      pdf(file, onefile = FALSE, width = 28, height = dotHeight() * 0.5)
       print(DotPlotF())
       dev.off()
     }
   )
+
+
 
   # ======== pHeatmap ======== #
   selectedCellsHmap <- reactive({
